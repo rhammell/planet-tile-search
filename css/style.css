@@ -1,0 +1,31 @@
+#search {
+  width: 464px;
+  height: 100vh; 
+  background-color: white;
+  float: left;
+}
+
+#preview { 
+  height: 224px; 
+  width: 100%;
+  background-color: yellow;
+}
+
+#preview {
+  cursor: default !important;
+  border-bottom: 1px solid gray;
+}
+
+#map { 
+  height: 100vh; 
+  width: calc(100% - 464px);
+  float: right;
+}
+
+.labelClass{
+  text-shadow: 0 0 0.1em black, 0 0 0.1em black,
+      0 0 0.1em black,0 0 0.1em black,0 0 0.1em;
+  color: white;
+}
+
+
