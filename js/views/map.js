@@ -13,7 +13,6 @@ var MapView = Backbone.View.extend({
             minZoom: 12,
             maxZoom: 18,
             zoomDelta: 0.5,
-            wheelPxPerZoomLevel: 150,
             zoomControl: false,
             attributionControl: false,
             layers: [planet],
