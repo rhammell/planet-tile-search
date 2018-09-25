@@ -12,6 +12,8 @@ var MapView = Backbone.View.extend({
             zoom: 12,
             minZoom: 12,
             maxZoom: 18,
+            zoomSnap: 0.5,
+            zoomDelta: 0.5,
             zoomControl: false,
             attributionControl: false,
             layers: [planet],
@@ -43,7 +45,7 @@ var MapView = Backbone.View.extend({
             interactive: false
         });
 
-        this._map.on('zoom', this.mapZoomend, this);
+        this._map.on('zoomend', this.mapZoomend, this);
         this._map.on('click', this.mapClick, this);
         this._map.on('mousemove', this.mapMousemove, this);
         this._map.on('moveend', this.mapMoveend, this);
@@ -58,7 +60,7 @@ var MapView = Backbone.View.extend({
 
     mapZoomend: function(e) {
         console.log(this._map.getZoom())
-        if (this._map.getZoom() < 16){
+        if (this._map.getZoom() < 15.5){
             this._map.removeLayer(this._highlightText);
         }
         else {

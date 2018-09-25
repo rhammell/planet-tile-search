@@ -5,24 +5,42 @@
   float: left;
 }
 
+#search-header {
+  height: 60px;
+  width: 100%;
+  background-color: white;
+  box-shadow: 1px 1px 30px #9d9d9d;
+  position: relative;
+  z-index: 2;
+}
+
 #preview { 
   height: 224px; 
   width: 100%;
-  background-color: yellow;
+  background-color: #e5e5e5;
+  cursor: default !important;
+  border-bottom: 1px solid #9d9d9d;
+  position: relative;
+  z-index: 1;
 }
 
-#preview {
-  cursor: default !important;
-  border-bottom: 1px solid gray;
+#search-results {
+  height: calc(100vh - 284px);
+  width: 100%;
+  background-color: white;
 }
 
 #map { 
   height: 100vh; 
   width: calc(100% - 464px);
   float: right;
+  background-color: #333333;
+  position: relative;
+  z-index: 3;
 }
 
 .labelClass{
+  font-size: 12px;
   text-shadow: 0 0 0.1em black, 0 0 0.1em black,
       0 0 0.1em black,0 0 0.1em black,0 0 0.1em;
   color: white;
