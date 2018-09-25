@@ -12,7 +12,7 @@ var MapView = Backbone.View.extend({
             zoom: 12,
             minZoom: 12,
             maxZoom: 18,
-            zoomSnap: 0.5,
+            zoomSnap: 0.01,
             zoomDelta: 0.5,
             zoomControl: false,
             attributionControl: false,
@@ -34,9 +34,9 @@ var MapView = Backbone.View.extend({
 
         var divIcon = L.divIcon({ 
             className: "labelClass",
-            html: "Click box to search",
-            iconSize: new L.Point(50, 50),
-            iconAnchor: new L.Point(25, 10)
+            html: "Click box<br>to search",
+            iconSize: new L.Point(100, 50),
+            iconAnchor: new L.Point(50, 10)
         })
 
         this._highlightText = L.marker([], {
