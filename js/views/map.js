@@ -12,9 +12,9 @@ var MapView = Backbone.View.extend({
             zoom: 12,
             minZoom: 12,
             maxZoom: 18,
-            zoomSnap: 0.0,
+            zoomSnap: 0.5,
             zoomDelta: 0.5,
-            wheelPxPerZoomLevel: 150,
+            wheelPxPerZoomLevel: 120,
             zoomControl: false,
             attributionControl: false,
             layers: [planet],
@@ -46,27 +46,38 @@ var MapView = Backbone.View.extend({
             interactive: false
         });
 
+        this._zooming = false;
+        this._lastmove = {};
+
+        this._map.on('zoomstart', this.mapZoomstart, this);
         this._map.on('zoomend', this.mapZoomend, this);
         this._map.on('click', this.mapClick, this);
         this._map.on('mousemove', this.mapMousemove, this);
         this._map.on('moveend', this.mapMoveend, this);
 
-        Backbone.trigger('mapMove', this._map.getBounds());
         Backbone.on('previewClick', this.onPreviewClick, this);
+
+        Backbone.trigger('mapMove', this._map.getBounds());
     },
 
     mapMoveend: function(e) {
         Backbone.trigger('mapMove', this._map.getBounds());
     },
 
+    mapZoomstart: function(e) {
+        this._zooming = true;
+    }, 
+
     mapZoomend: function(e) {
         console.log(this._map.getZoom())
-        if (this._map.getZoom() < 15.5){
+        if (this._map.getZoom() < 15.5 && this._map.hasLayer(this._highlightText)){
             this._map.removeLayer(this._highlightText);
-        }
-        else {
+        } 
+        if (this._map.getZoom() >= 15.5 && this._map.hasLayer(this._highlightText) == false){
             this._map.addLayer(this._highlightText);
         }
+        this._zooming = false;
+        this.highlightTile(this._lastmove);
     }, 
 
     mapClick: function(e) {
@@ -74,7 +85,10 @@ var MapView = Backbone.View.extend({
     }, 
 
     mapMousemove: function(e) {
-        this.highlightTile(e);
+        this._lastmove = e;
+        if (this._zooming == false) {
+            this.highlightTile(e);
+        }
     }, 
 
     highlightTile: function(e) {
@@ -95,7 +109,6 @@ var MapView = Backbone.View.extend({
     }, 
 
     onPreviewClick: function(latlng) {
-        console.log('preview clicked');
         this._map.setView(latlng);
     }
 
