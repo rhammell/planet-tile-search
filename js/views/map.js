@@ -1,14 +1,17 @@
-var MapView = Backbone.View.extend({
+App.Views.Map = Backbone.View.extend({
+
     initialize: function(){
 
-        var planet = L.tileLayer('https://tiles{s}.planet.com/basemaps/v1/planet-tiles/{mosaic_name}/gmap/{z}/{x}/{y}.png?api_key={api_key}', {
-            subdomains: ['0','1','2','3'],
-            mosaic_name: 'global_monthly_2018_04_mosaic',
-            api_key: 'b7b3a6eb8c00428cb8c1342e456821fe'
+        this._bounds = App.Data.bounds;
+
+        var planet = L.tileLayer(App.Data.url, {
+            subdomains: App.Data.subdomains,
+            mosaic_name: App.Data.mosaic_name,
+            api_key: App.Data.api_key
         });
 
         this._map = L.map(this.$el.attr('id'), {
-            center: [37.759513, -122.448082],            
+            center: this._bounds.getCenter(),            
             zoom: 12,
             minZoom: 12,
             maxZoom: 18,
@@ -19,8 +22,7 @@ var MapView = Backbone.View.extend({
             attributionControl: false,
             layers: [planet],
             maxBoundsViscosity: 0.9,
-            maxBounds: [[37.677299, -122.559356],
-                        [37.834734, -122.313537]]
+            maxBounds: this._bounds
         });
 
         L.control.attribution({position: 'bottomleft'})
@@ -47,11 +49,13 @@ var MapView = Backbone.View.extend({
         });
 
         this._zooming = false;
+        this._clicked = 0;
         this._lastmove = {};
 
         this._map.on('zoomstart', this.mapZoomstart, this);
         this._map.on('zoomend', this.mapZoomend, this);
         this._map.on('click', this.mapClick, this);
+        this._map.on('dblclick', this.mapDblclick, this);
         this._map.on('mousemove', this.mapMousemove, this);
         this._map.on('moveend', this.mapMoveend, this);
 
@@ -70,18 +74,28 @@ var MapView = Backbone.View.extend({
 
     mapZoomend: function(e) {
         console.log(this._map.getZoom())
-        if (this._map.getZoom() < 15.5 && this._map.hasLayer(this._highlightText)){
-            this._map.removeLayer(this._highlightText);
-        } 
-        if (this._map.getZoom() >= 15.5 && this._map.hasLayer(this._highlightText) == false){
-            this._map.addLayer(this._highlightText);
-        }
         this._zooming = false;
         this.highlightTile(this._lastmove);
     }, 
 
     mapClick: function(e) {
-        console.log('click');
+        this._clicked = this._clicked + 1;
+        me = this;
+        setTimeout(function(){
+            if(me._clicked == 1){
+                console.log('sinle click');
+                if (me._bounds.contains(e.latlng)) {
+                    var tile = latlng2tile(e.latlng, 18);
+                    console.log(tile)
+                }              
+                me._clicked = 0;
+            }
+        }, 300);
+    },
+
+    mapDblclick: function(e) {
+        console.log('dboule click');
+        this._clicked = 0;
     }, 
 
     mapMousemove: function(e) {
@@ -92,20 +106,42 @@ var MapView = Backbone.View.extend({
     }, 
 
     highlightTile: function(e) {
-        var tile = latlng2tile(e.latlng, 18);
-        var bounds = tile2bounds(tile);
 
-        var polyBounds = [
-            bounds.getSouthWest(),
-            bounds.getNorthWest(),
-            bounds.getNorthEast(),
-            bounds.getSouthEast()
-        ];
+        if (this._bounds.contains(e.latlng)) {
 
-        var polyCenter = bounds.getCenter();
+            if (this._map.hasLayer(this._highlightPoly) == false) {
+                this._map.addLayer(this._highlightPoly);
+            }
+            if (this._map.getZoom() < 15.5 && this._map.hasLayer(this._highlightText)){
+                this._map.removeLayer(this._highlightText);
+            } 
+            if (this._map.getZoom() >= 15.5 && this._map.hasLayer(this._highlightText) == false){
+                this._map.addLayer(this._highlightText);
+            }
 
-        this._highlightText.setLatLng(polyCenter);
-        this._highlightPoly.setLatLngs(polyBounds);
+            var tile = latlng2tile(e.latlng, 18);
+            var bounds = tile2bounds(tile);
+
+            var polyBounds = [
+                bounds.getSouthWest(),
+                bounds.getNorthWest(),
+                bounds.getNorthEast(),
+                bounds.getSouthEast()
+            ];
+
+            var polyCenter = bounds.getCenter();
+
+            this._highlightText.setLatLng(polyCenter);
+            this._highlightPoly.setLatLngs(polyBounds);
+
+        }  else { 
+            if (this._map.hasLayer(this._highlightPoly)) {
+                this._map.removeLayer(this._highlightPoly)
+            }
+            if (this._map.hasLayer(this._highlightText)) {
+                this._map.removeLayer(this._highlightText)
+            }
+        }
     }, 
 
     onPreviewClick: function(latlng) {
