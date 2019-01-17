@@ -85,7 +85,7 @@ App.Views.Map = Backbone.View.extend({
             if(me._clicked == 1){
                 console.log('sinle click');
                 if (me._bounds.contains(e.latlng)) {
-                    var tile = latlng2tile(e.latlng, 18);
+                    var tile = latlng2tile(e.latlng, 16);
                     console.log(tile)
                 }              
                 me._clicked = 0;
@@ -119,7 +119,7 @@ App.Views.Map = Backbone.View.extend({
                 this._map.addLayer(this._highlightText);
             }
 
-            var tile = latlng2tile(e.latlng, 18);
+            var tile = latlng2tile(e.latlng, 16);
             var bounds = tile2bounds(tile);
 
             var polyBounds = [
